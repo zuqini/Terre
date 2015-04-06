@@ -9,16 +9,29 @@ class MainScene : public cocos2d::Layer
 {
 public:
     static cocos2d::Scene* createScene();
-    static void resetTickTime();
     virtual bool init();
     void menuCloseCallback(cocos2d::Ref* pSender);
     void addEntitySubs(Entity* entity);
     void update(float) override;
+
+    virtual bool onTouchBegan(cocos2d::Touch*, cocos2d::Event*);
+    virtual void onTouchEnded(cocos2d::Touch*, cocos2d::Event*);
+    virtual void onTouchMoved(cocos2d::Touch*, cocos2d::Event*);
+    virtual void onTouchCancelled(cocos2d::Touch*, cocos2d::Event*);
+
+    virtual bool onTouchesBegan(std::vector<cocos2d::Touch*>, cocos2d::Event*);
+    virtual void onTouchesEnded(std::vector<cocos2d::Touch*>, cocos2d::Event*);
+    virtual void onTouchesMoved(std::vector<cocos2d::Touch*>, cocos2d::Event*);
+    virtual void onTouchesCancelled(std::vector<cocos2d::Touch*>, cocos2d::Event*);
+
     CREATE_FUNC(MainScene);
 private:
-    static double lastTickTime;
-    static double accumulator;
+    void scaleCenter(cocos2d::Node*, float, cocos2d::Vec2);
+
+    double accumulator;
     Universe universe;
+
+    const double delta = 1./60;
 };
 
 #endif // __MAIN_SCENE_H__
