@@ -1,7 +1,7 @@
 #include "MainScene.h"
 #define WORLD 0
 
-#define ZOOM_MULTIPLIER 0.001f
+#define ZOOM_MULTIPLIER 0.002f
 
 USING_NS_CC;
 
@@ -98,6 +98,12 @@ void MainScene::onTouchesMoved(std::vector<Touch*> touches, Event* event)
 		Vec2 pinchCenter = initT1.getMidpoint(initT2);
 
 		scaleCenter(world, world->getScale() - distDelta * ZOOM_MULTIPLIER, pinchCenter);
+
+		//move
+		Vec2 diff = touches[0]->getDelta();
+		Vec2 currPos = world->getPosition();
+		currPos.add(diff);
+		world->setPosition(currPos);
 	}
 }
 
@@ -116,13 +122,6 @@ void MainScene::onTouchEnded(Touch* touch, Event* event)
 
 void MainScene::onTouchMoved(Touch* touch, Event* event)
 {
-
-	auto world = this->getChildByTag(WORLD);
-	//move
-	Vec2 diff = touch->getDelta();
-	Vec2 currPos = world->getPosition();
-	currPos.add(diff);
-	world->setPosition(currPos);
 }
 
 void MainScene::onTouchCancelled(Touch* touch, Event* event)
