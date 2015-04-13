@@ -8,7 +8,7 @@
 
 USING_NS_CC;
 
-Universe::Universe()
+Universe::Universe() : DynamicLightWorld()
 {
 	b2Vec2 gravity = b2Vec2(0.0f, 0.0f);
 	world = new b2World(gravity);
@@ -26,7 +26,7 @@ void Universe::step(float delta)
 	world->Step(delta, 8, 3);
 }
 
-void Universe:: generateSystem(Vec2 origin, Size visibleSize)
+void Universe::generateSystem(Vec2 origin, Size visibleSize)
 {
 	/**
 	 * @TODO
@@ -45,6 +45,7 @@ void Universe:: generateSystem(Vec2 origin, Size visibleSize)
 		break;
 	}
 	Entity* star = addEntity(Entity::makeStar(world, 100000, Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y), starSprite));
+	DynamicLightWorld::addSource(star);
 	Vec2 currPos = star->getPos();
 	currPos.add(Vec2(300,0));
 	Sprite* planetSprite;
@@ -67,7 +68,8 @@ void Universe:: generateSystem(Vec2 origin, Size visibleSize)
 			planetSprite = Sprite::create("Planet03.png");
 			break;
 		}
-		Entity* currPlanet = addEntity(Entity::makePlanet(world, rand() % 1000 + 500, currPos, planetSprite));
+		Planet* currPlanet = (Planet*)addEntity(Entity::makePlanet(world, rand() % 1000 + 500, currPos, planetSprite));
+		DynamicLightWorld::addPlanet(currPlanet);
 		currPlanet->applyImpulse(Vec2(0,currPlanet->getMass() * sqrt(G_CONSTANT * star->getMass() / star->getPos().getDistance(currPlanet->getPos()))));
 	}
 }
@@ -98,7 +100,7 @@ void Universe::applyGravity()
 	}
 }
 
-void Universe::render()
+void Universe::updatePos()
 {
 	for(auto i = 0; i < entities.size(); ++i) {
 		entities[i]->getUpdateSprite();

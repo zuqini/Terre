@@ -17,7 +17,8 @@ LOCAL_SRC_FILES := maincpp/main.cpp \
                    ../../Classes/Entity.cpp \
                    ../../Classes/Planet.cpp \
                    ../../Classes/Star.cpp \
-                   ../../Classes/BodyFactory.cpp \
+                   ../../Classes/BodyUtil.cpp \
+                   ../../Classes/DynamicLightWorld.cpp \
                                                          
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \

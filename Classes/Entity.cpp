@@ -1,9 +1,9 @@
 #include "cocos2d.h"
 #include "Planet.h"
 #include "Star.h"
-#include "BodyFactory.h"
 #include "Box2D.h"
 #include <list>
+#include "BodyUtil.h"
 
 USING_NS_CC;
 
@@ -11,12 +11,12 @@ Entity::Entity(b2World* world, b2Body* body): world(world), body(body){};
 
 Entity* Entity::makePlanet(b2World* world, float density, Vec2 pos, Sprite* sprite)
 {
-	return new Planet(world, BodyFactory::createCircularBody(world, density, pos, sprite));
+	return new Planet(world, BodyUtil::createCircularBody(world, density, pos, sprite));
 }
 
 Entity* Entity::makeStar(b2World* world, float density, Vec2 pos, Sprite* sprite)
 {
-	return new Star(world, BodyFactory::createCircularBody(world, density, pos, sprite));
+	return new Star(world, BodyUtil::createCircularBody(world, density, pos, sprite));
 }
 
 Sprite* Entity::getUpdateSprite()
@@ -53,7 +53,7 @@ Vec2 Entity::getVel()
 	return Vec2(vel.x, vel.y);
 }
 
-b2Body* Entity::getBody()
+bool Entity::castRay(b2RayCastOutput* output, const b2RayCastInput& input)
 {
-	return body;
+	return body->GetFixtureList()->RayCast(output, input, 0);
 }

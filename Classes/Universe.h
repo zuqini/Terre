@@ -3,19 +3,20 @@
 
 #include "cocos2d.h"
 #include "Box2D.h"
+#include "DynamicLightWorld.h"
 #include "Entity.h"
 #include <list>
 
 USING_NS_CC;
 
-class Universe
+class Universe : public DynamicLightWorld
 {
 public:
 	Universe();
 	Entity* addEntity(Entity* entity);
 	void generateSystem(Vec2 origin, Size visibleSize);
 	void generateEntities(Vec2 origin, Size visibleSize);
-	void render();
+	void updatePos();
 	void step(float delta);
 	std::vector<Entity*> getEntities();
 private:

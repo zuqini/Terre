@@ -7,7 +7,7 @@
 USING_NS_CC;
 
 //creates and defines b2bodies
-namespace BodyFactory
+namespace BodyUtil
 {
     b2Body* createCircularBody(b2World* world, float density, Vec2 pos, Sprite* sprite);
 }

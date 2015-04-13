@@ -1,10 +1,11 @@
+#include "BodyUtil.h"
+
 #include "cocos2d.h"
-#include "BodyFactory.h"
 #include "Box2D.h"
 
 USING_NS_CC;
 
-namespace BodyFactory
+namespace BodyUtil
 {
 	b2Body* createCircularBody(b2World* world, float density, Vec2 pos, Sprite* sprite) {
 		b2BodyDef bodyDef;

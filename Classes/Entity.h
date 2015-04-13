@@ -19,9 +19,10 @@ public:
 	float getMass();
 	Vec2 getPos();
 	Vec2 getVel();
-	b2Body* getBody();
-private:
+	bool castRay(b2RayCastOutput* output, const b2RayCastInput& input);
+protected:
 	b2Body* body;
+private:
 	b2World* world;
 };
 
