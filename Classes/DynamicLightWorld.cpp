@@ -1,13 +1,14 @@
-#include "DynamicLightWorld.h"
-#include "Box2D.h"
-#include "Planet.h"
+#include <algorithm>    // std::sort
 #include <cstdlib>
 #include <cmath>
 #include <ctime>
+#include "DynamicLightWorld.h"
+#include "Box2D.h"
+#include "Planet.h"
 #include "LightRay.h"
 
 #define MAX_FRAC 5
-#define FRAC_UNIT 30
+#define FRAC_UNIT 1000
 
 USING_NS_CC;
 
@@ -58,17 +59,52 @@ void DynamicLightWorld::castToPlanet(Entity* source, Planet* dest, std::vector<b
 	Vec2 ray = dest->getPos() - source->getPos();
 	Vec2 perp = ray.getPerp();
 	perp.normalize();
-	perp *= radius;
+	Vec2 perpOffset = perp;
+	perp.scale(radius);
 
 	Vec2 rPerp = ray.getRPerp();
 	rPerp.normalize();
-	rPerp *= radius;
+	Vec2 rPerpOffset = rPerp;
+	rPerp.scale(radius);
 
+	Vec2 p2L = dest->getPos() + perp + perpOffset;
 	Vec2 p2 = dest->getPos() + perp;
-	Vec2 rp2 = dest->getPos() + rPerp;
+	Vec2 p2R = dest->getPos() + perp - perpOffset;
 
+	Vec2 rp2L = dest->getPos() + rPerp + rPerpOffset;
+	Vec2 rp2 = dest->getPos() + rPerp;
+	Vec2 rp2R = dest->getPos() + rPerp - rPerpOffset;
+
+
+	inputs.push_back(makeInput(source->getPos(), p2L));
 	inputs.push_back(makeInput(source->getPos(), p2));
+	inputs.push_back(makeInput(source->getPos(), p2R));
+	inputs.push_back(makeInput(source->getPos(), rp2L));
 	inputs.push_back(makeInput(source->getPos(), rp2));
+	inputs.push_back(makeInput(source->getPos(), rp2R));
+}
+
+bool sortByRadian (struct LightRay i, struct LightRay j)
+{
+	Vec2 a = i.p2-i.p1;
+	Vec2 b = j.p2-j.p1;
+	float angleA = a.getAngle();
+	float angleB = b.getAngle();
+	if(i.p2.y > i.p1.y && i.p2.x > i.p1.x && j.p2.y > j.p1.y && j.p2.x > j.p1.x)
+		return (angleA<angleB);
+	else if(i.p2.y > i.p1.y && i.p2.x > i.p1.x && (j.p2.y < j.p1.y || j.p2.x < j.p1.x))
+		return true;
+	else if(i.p2.y > i.p1.y && i.p2.x < i.p1.x && j.p2.y > j.p1.y && j.p2.x < j.p1.x)
+		return (angleA<angleB);
+	else if(i.p2.y > i.p1.y && i.p2.x < i.p1.x && j.p2.y < j.p1.y)
+		return true;
+	else if(i.p2.y < i.p1.y && i.p2.x < i.p1.x && j.p2.y < j.p1.y && j.p2.x < j.p1.x)
+		return (angleA<angleB);
+	else if(i.p2.y < i.p1.y && i.p2.x < i.p1.x && j.p2.y < j.p1.y && j.p2.x > j.p1.x)
+		return true;
+	else if(i.p2.y < i.p1.y && i.p2.x > i.p1.x && j.p2.y < j.p1.y && j.p2.x > j.p1.x)
+		return (angleA<angleB);
+	return false;
 }
 
 std::vector<struct LightRay> DynamicLightWorld::getRays()
@@ -90,24 +126,26 @@ std::vector<struct LightRay> DynamicLightWorld::getRays()
 	auto numOfInputs = inputs.size();
 	for(auto i = 0; i < numOfInputs; i++)
 	{
+		LightRay ray;
+		ray.p1 = Vec2(inputs[i].p1.x, inputs[i].p1.y);
+		ray.p2 = Vec2(inputs[i].p2.x, inputs[i].p2.y);
 		for(auto j = 0; j < numOfPlanets; j++)
 		{
 			b2RayCastOutput output;
-			LightRay ray;
-			ray.p1 = Vec2(inputs[i].p1.x, inputs[i].p1.y);
-			ray.p2 = Vec2(inputs[i].p2.x, inputs[i].p2.y);
 			if (planets[j]->castRay(&output, inputs[i]))
 			{
 				ray.frac = output.fraction;
 				ray.normal = Vec2(output.normal.x, output.normal.y);
+				break;
 			}
-			else
+			else if (j == numOfPlanets - 1)
 			{
 				ray.frac = inputs[i].maxFraction;
 				ray.normal = Vec2::ZERO;
 			}
-			rays.push_back(ray);
 		}
+		rays.push_back(ray);
 	}
+	std::sort (rays.begin(), rays.end(), sortByRadian);
 	return rays;
 }

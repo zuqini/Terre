@@ -1,5 +1,8 @@
 #include "MainScene.h"
+#include "LightRay.h"
+
 #define WORLD 0
+#define DRAW 1
 
 #define ZOOM_MULTIPLIER 0.005f
 
@@ -52,7 +55,8 @@ bool MainScene::init()
 
     auto world = Node::create();
     world->setPosition(origin);
-
+    auto drawNode = DrawNode::create();
+    world->addChild(drawNode, 10, DRAW);
     for (std::vector<Entity*>::const_iterator iterator = entities.begin(); iterator != entities.end(); ++iterator) {
     	world->addChild((*iterator)->getUpdateSprite());
     }
@@ -130,13 +134,41 @@ void MainScene::onTouchCancelled(Touch* touch, Event* event)
 
 void MainScene::update(float dt){
 	accumulator += dt;
-
 	while(accumulator > delta)
 	{
 		universe.step(delta);
 		accumulator -= delta;
 	}
 	universe.updatePos();
+	std::vector<struct LightRay> rays = universe.getRays();
+	auto length = rays.size();
+
+	auto drawNode = (DrawNode*)this->getChildByTag(WORLD)->getChildByTag(DRAW);
+	drawNode->clear();
+
+	Vec2 first = rays[0].p1 + (rays[0].p2 - rays[0].p1) * rays[0].frac;
+	Vec2 last = rays[length - 1].p1 + (rays[length - 1].p2 - rays[length - 1].p1) * rays[length - 1].frac;
+
+	for(auto i = 1; i < length; i++)
+	{
+		Vec2 p2 = rays[i].p1 + (rays[i].p2 - rays[i].p1) * rays[i].frac;
+		Vec2 prevP2 = rays[i-1].p1 + (rays[i-1].p2 - rays[i-1].p1) * rays[i-1].frac;
+		drawNode->drawSegment(rays[i].p1, p2, 1, Color4F::GREEN);
+
+		Point verts[3] = {
+				Point(rays[i].p1.x, rays[i].p1.y),
+				Point(prevP2.x, prevP2.y),
+				Point(p2.x, p2.y)
+		};
+		drawNode->drawPolygon(verts, 3, Color4F(1, 1, 0, 0.5), 0, Color4F::BLACK);
+	}
+
+	Point verts[3] = {
+				Point(rays[0].p1.x, rays[0].p1.y),
+				Point(first.x, first.y),
+				Point(last.x, last.y)
+	};
+	drawNode->drawPolygon(verts, 3, Color4F(1, 1, 0, 0.25), 0, Color4F::BLACK);
 }
 
 void MainScene::menuCloseCallback(Ref* pSender)
