@@ -7,9 +7,6 @@
 #include "Planet.h"
 #include "LightRay.h"
 
-#define MAX_FRAC 5
-#define FRAC_UNIT 1000
-
 USING_NS_CC;
 
 DynamicLightWorld::DynamicLightWorld()
@@ -38,17 +35,17 @@ std::vector<Planet*> DynamicLightWorld::getPlanets()
 	return planets;
 }
 
-b2RayCastInput DynamicLightWorld::makeInput(Vec2 p1, Vec2 p2)
+b2RayCastInput DynamicLightWorld::makeInput(Vec2 p1, Vec2 p2, float fracUnit, float maxFrac)
 {
 	Vec2 ray = p2 - p1;
 	ray.normalize();
-	ray.scale(FRAC_UNIT);
+	ray.scale(fracUnit);
 	p2 = p1 + ray;
 
 	b2RayCastInput input;
 	input.p1 = b2Vec2(p1.x, p1.y);
 	input.p2 = b2Vec2(p2.x, p2.y);
-	input.maxFraction = MAX_FRAC;
+	input.maxFraction = maxFrac;
 
 	return input;
 }
@@ -75,13 +72,14 @@ void DynamicLightWorld::castToPlanet(Entity* source, Planet* dest, std::vector<b
 	Vec2 rp2 = dest->getPos() + rPerp;
 	Vec2 rp2R = dest->getPos() + rPerp - rPerpOffset;
 
-
-	inputs.push_back(makeInput(source->getPos(), p2L));
-	inputs.push_back(makeInput(source->getPos(), p2));
-	inputs.push_back(makeInput(source->getPos(), p2R));
-	inputs.push_back(makeInput(source->getPos(), rp2L));
-	inputs.push_back(makeInput(source->getPos(), rp2));
-	inputs.push_back(makeInput(source->getPos(), rp2R));
+	float unitFrac = 50;
+	float maxFrac = 50;
+	inputs.push_back(makeInput(source->getPos(), p2L, unitFrac, maxFrac));
+	inputs.push_back(makeInput(source->getPos(), p2, unitFrac, maxFrac));
+	inputs.push_back(makeInput(source->getPos(), p2R, unitFrac, maxFrac));
+	inputs.push_back(makeInput(source->getPos(), rp2L, unitFrac, maxFrac));
+	inputs.push_back(makeInput(source->getPos(), rp2, unitFrac, maxFrac));
+	inputs.push_back(makeInput(source->getPos(), rp2R, unitFrac, maxFrac));
 }
 
 bool sortByRadian (struct LightRay i, struct LightRay j)
@@ -90,32 +88,45 @@ bool sortByRadian (struct LightRay i, struct LightRay j)
 	Vec2 b = j.p2-j.p1;
 	float angleA = a.getAngle();
 	float angleB = b.getAngle();
-	if(i.p2.y > i.p1.y && i.p2.x > i.p1.x && j.p2.y > j.p1.y && j.p2.x > j.p1.x)
+	if(i.p2.y >= i.p1.y && i.p2.x >= i.p1.x && j.p2.y >= j.p1.y && j.p2.x >= j.p1.x)
 		return (angleA<angleB);
-	else if(i.p2.y > i.p1.y && i.p2.x > i.p1.x && (j.p2.y < j.p1.y || j.p2.x < j.p1.x))
+	else if(i.p2.y >= i.p1.y && i.p2.x >= i.p1.x && (j.p2.y <= j.p1.y || j.p2.x < j.p1.x))
 		return true;
-	else if(i.p2.y > i.p1.y && i.p2.x < i.p1.x && j.p2.y > j.p1.y && j.p2.x < j.p1.x)
+	else if(i.p2.y >= i.p1.y && i.p2.x < i.p1.x && j.p2.y >= j.p1.y && j.p2.x < j.p1.x)
 		return (angleA<angleB);
-	else if(i.p2.y > i.p1.y && i.p2.x < i.p1.x && j.p2.y < j.p1.y)
+	else if(i.p2.y >= i.p1.y && i.p2.x < i.p1.x && j.p2.y < j.p1.y)
 		return true;
-	else if(i.p2.y < i.p1.y && i.p2.x < i.p1.x && j.p2.y < j.p1.y && j.p2.x < j.p1.x)
+	else if(i.p2.y < i.p1.y && i.p2.x <= i.p1.x && j.p2.y < j.p1.y && j.p2.x <= j.p1.x)
 		return (angleA<angleB);
-	else if(i.p2.y < i.p1.y && i.p2.x < i.p1.x && j.p2.y < j.p1.y && j.p2.x > j.p1.x)
+	else if(i.p2.y < i.p1.y && i.p2.x <= i.p1.x && j.p2.y < j.p1.y && j.p2.x > j.p1.x)
 		return true;
 	else if(i.p2.y < i.p1.y && i.p2.x > i.p1.x && j.p2.y < j.p1.y && j.p2.x > j.p1.x)
 		return (angleA<angleB);
 	return false;
 }
 
+void DynamicLightWorld::cast360(Entity* source, std::vector<b2RayCastInput>& inputs)
+{
+	float unitFrac = 50;
+	float maxFrac = 50;
+	for(auto radian = 0.; radian < 2. * M_PI; radian += (2. * M_PI / 200))
+	{
+		Vec2 p2 = Vec2::forAngle(radian) + source->getPos();
+		inputs.push_back(makeInput(source->getPos(), p2, unitFrac, maxFrac));
+	}
+}
+
 std::vector<struct LightRay> DynamicLightWorld::getRays()
 {
 	std::vector<b2RayCastInput> inputs;
 	std::vector<LightRay> rays;
-	//Get all input rays
+
+	//Get input rays
 	auto numOfSources = sources.size();
 	auto numOfPlanets = planets.size();
 	for(auto i = 0; i < numOfSources; i++)
 	{
+		cast360(sources[i], inputs);
 		for(auto j = 0; j < numOfPlanets; j++)
 		{
 			castToPlanet(sources[i], planets[j], inputs);
@@ -129,6 +140,7 @@ std::vector<struct LightRay> DynamicLightWorld::getRays()
 		LightRay ray;
 		ray.p1 = Vec2(inputs[i].p1.x, inputs[i].p1.y);
 		ray.p2 = Vec2(inputs[i].p2.x, inputs[i].p2.y);
+		ray.maxFrac = inputs[i].maxFraction;
 		for(auto j = 0; j < numOfPlanets; j++)
 		{
 			b2RayCastOutput output;

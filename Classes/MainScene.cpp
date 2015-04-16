@@ -132,6 +132,60 @@ void MainScene::onTouchCancelled(Touch* touch, Event* event)
 {
 }
 
+/**
+ * @TODO
+ * this method could(should) be improved.
+ */
+void MainScene::intensifyLight(struct LightRay ray1, struct LightRay ray2)
+{
+	auto drawNode = (DrawNode*)this->getChildByTag(WORLD)->getChildByTag(DRAW);
+
+	auto length1 = ray1.frac < 1 ? ray1.frac : 1;
+	auto length2 = ray2.frac < 1 ? ray2.frac : 1;
+
+	Vec2 source = ray1.p1;
+	Vec2 p1 = ray1.p1 + (ray1.p2 - ray1.p1) * length1;
+	Vec2 p2 = ray2.p1 + (ray2.p2 - ray2.p1) * length2;
+	float fracUnit1 = ray1.p2.getDistance(ray1.p1);
+	float fracUnit2 = ray2.p2.getDistance(ray2.p1);
+
+	Point verts[3] = {
+			Point(source.x, source.y),
+			Point(p1.x, p1.y),
+			Point(p2.x, p2.y)
+	};
+	drawNode->drawPolygon(verts, 3, Color4F(1, 1, 0, 1), 0, Color4F::BLACK);
+
+	Vec2 p3;
+	Vec2 p4;
+
+	while(length1 <= ray1.frac || length2 <= ray2.frac)
+	{
+		length1 = length1 + 1 < ray1.frac ? length1 + 1 : ray1.frac;
+		length2 = length2 + 1 < ray2.frac ? length2 + 1 : ray2.frac;
+
+		p3 = ray1.p1 + (ray1.p2 - ray1.p1) * length1;
+		p4 = ray2.p1 + (ray2.p2 - ray2.p1) * length2;
+		Point verts1[3] = {
+				Point(p1.x, p1.y),
+				Point(p2.x, p2.y),
+				Point(p3.x, p3.y),
+		};
+		drawNode->drawPolygon(verts1, 3, Color4F(1, 1, 0, (ray1.maxFrac - length1) / ray1.maxFrac), 0, Color4F::BLACK);
+		Point verts2[3] = {
+				Point(p2.x, p2.y),
+				Point(p3.x, p3.y),
+				Point(p4.x, p4.y),
+		};
+		drawNode->drawPolygon(verts2, 3, Color4F(1, 1, 0, (ray1.maxFrac - length1) / ray1.maxFrac), 0, Color4F::BLACK);
+		p1 = Vec2(p3);
+		p2 = Vec2(p4);
+
+		if(length1 == ray1.frac && length2 == ray2.frac)
+			break;
+	}
+}
+
 void MainScene::update(float dt){
 	accumulator += dt;
 	while(accumulator > delta)
@@ -146,29 +200,36 @@ void MainScene::update(float dt){
 	auto drawNode = (DrawNode*)this->getChildByTag(WORLD)->getChildByTag(DRAW);
 	drawNode->clear();
 
+	/*
 	Vec2 first = rays[0].p1 + (rays[0].p2 - rays[0].p1) * rays[0].frac;
 	Vec2 last = rays[length - 1].p1 + (rays[length - 1].p2 - rays[length - 1].p1) * rays[length - 1].frac;
-
+	*/
 	for(auto i = 1; i < length; i++)
 	{
+		/*
 		Vec2 p2 = rays[i].p1 + (rays[i].p2 - rays[i].p1) * rays[i].frac;
 		Vec2 prevP2 = rays[i-1].p1 + (rays[i-1].p2 - rays[i-1].p1) * rays[i-1].frac;
-		drawNode->drawSegment(rays[i].p1, p2, 1, Color4F::GREEN);
+		//drawNode->drawSegment(rays[i].p1, p2, 1, Color4F::GREEN);
 
 		Point verts[3] = {
 				Point(rays[i].p1.x, rays[i].p1.y),
 				Point(prevP2.x, prevP2.y),
 				Point(p2.x, p2.y)
 		};
-		drawNode->drawPolygon(verts, 3, Color4F(1, 1, 0, 0.5), 0, Color4F::BLACK);
-	}
+		drawNode->drawPolygon(verts, 3, Color4F(1, 1, 0, 0.25), 0, Color4F::BLACK);
+		*/
 
+		intensifyLight(rays[i-1], rays[i]);
+	}
+	intensifyLight(rays[0], rays[length - 1]);
+	/*
 	Point verts[3] = {
 				Point(rays[0].p1.x, rays[0].p1.y),
 				Point(first.x, first.y),
 				Point(last.x, last.y)
 	};
 	drawNode->drawPolygon(verts, 3, Color4F(1, 1, 0, 0.25), 0, Color4F::BLACK);
+	*/
 }
 
 void MainScene::menuCloseCallback(Ref* pSender)

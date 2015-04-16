@@ -12,6 +12,7 @@ public:
     virtual bool init();
     void menuCloseCallback(cocos2d::Ref* pSender);
     void addEntitySubs(Entity* entity);
+    void intensifyLight(struct LightRay ray1, struct LightRay ray2);
     void update(float) override;
 
     virtual bool onTouchBegan(cocos2d::Touch*, cocos2d::Event*);
