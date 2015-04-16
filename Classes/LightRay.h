@@ -10,7 +10,6 @@ struct LightRay
 	Vec2 p2;
 	Vec2 normal;
 	float frac;
-	float maxFrac;
 };
 
 #endif

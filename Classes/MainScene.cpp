@@ -171,13 +171,13 @@ void MainScene::intensifyLight(struct LightRay ray1, struct LightRay ray2)
 				Point(p2.x, p2.y),
 				Point(p3.x, p3.y),
 		};
-		drawNode->drawPolygon(verts1, 3, Color4F(1, 1, 0, (ray1.maxFrac - length1) / ray1.maxFrac), 0, Color4F::BLACK);
+		drawNode->drawPolygon(verts1, 3, Color4F(1, 1, 0, pow(0.96, length1)), 0, Color4F::BLACK);
 		Point verts2[3] = {
 				Point(p2.x, p2.y),
 				Point(p3.x, p3.y),
 				Point(p4.x, p4.y),
 		};
-		drawNode->drawPolygon(verts2, 3, Color4F(1, 1, 0, (ray1.maxFrac - length1) / ray1.maxFrac), 0, Color4F::BLACK);
+		drawNode->drawPolygon(verts2, 3, Color4F(1, 1, 0, pow(0.96, length1)), 0, Color4F::BLACK);
 		p1 = Vec2(p3);
 		p2 = Vec2(p4);
 
