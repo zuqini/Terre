@@ -14,15 +14,17 @@ class DynamicLightWorld
 {
 public:
 	DynamicLightWorld();
+	std::vector<struct LightRay> getRays();
+protected:
 	Entity* addSource(Entity* entity);
 	Planet* addPlanet(Planet* entity);
-	std::vector<struct LightRay> getRays();
+private:
+	std::vector<Entity*> getSources();
+	std::vector<Planet*> getPlanets();
 	b2RayCastInput makeInput(Vec2 p1, Vec2 p2, float fracUnit, float maxFrac);
 	void cast360(Entity* source, std::vector<b2RayCastInput>& inputs);
 	void castToPlanet(Entity* source, Planet* dest, std::vector<b2RayCastInput>&);
-	std::vector<Entity*> getSources();
-	std::vector<Planet*> getPlanets();
-private:
+
 	std::vector<Entity*> sources;
 	std::vector<Planet*> planets;
 };

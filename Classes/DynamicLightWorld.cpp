@@ -56,12 +56,12 @@ void DynamicLightWorld::castToPlanet(Entity* source, Planet* dest, std::vector<b
 	Vec2 ray = dest->getPos() - source->getPos();
 	Vec2 perp = ray.getPerp();
 	perp.normalize();
-	Vec2 perpOffset = perp;
+	Vec2 perpOffset = perp*2;
 	perp.scale(radius);
 
 	Vec2 rPerp = ray.getRPerp();
 	rPerp.normalize();
-	Vec2 rPerpOffset = rPerp;
+	Vec2 rPerpOffset = rPerp*2;
 	rPerp.scale(radius);
 
 	Vec2 p2L = dest->getPos() + perp + perpOffset;
@@ -73,7 +73,7 @@ void DynamicLightWorld::castToPlanet(Entity* source, Planet* dest, std::vector<b
 	Vec2 rp2R = dest->getPos() + rPerp - rPerpOffset;
 
 	float unitFrac = 50;
-	float maxFrac = 100;
+	float maxFrac = 500;
 	inputs.push_back(makeInput(source->getPos(), p2L, unitFrac, maxFrac));
 	inputs.push_back(makeInput(source->getPos(), p2, unitFrac, maxFrac));
 	inputs.push_back(makeInput(source->getPos(), p2R, unitFrac, maxFrac));
@@ -108,8 +108,8 @@ bool sortByRadian (struct LightRay i, struct LightRay j)
 void DynamicLightWorld::cast360(Entity* source, std::vector<b2RayCastInput>& inputs)
 {
 	float unitFrac = 50;
-	float maxFrac = 100;
-	for(auto radian = 0.; radian < 2. * M_PI; radian += (2. * M_PI / 200))
+	float maxFrac = 500;
+	for(auto radian = 0.; radian < 2. * M_PI; radian += (2. * M_PI / 20))
 	{
 		Vec2 p2 = Vec2::forAngle(radian) + source->getPos();
 		inputs.push_back(makeInput(source->getPos(), p2, unitFrac, maxFrac));
