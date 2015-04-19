@@ -15,7 +15,8 @@ public:
 	static Entity* makeStar(b2World* world, float density, Vec2 pos, Sprite* sprite);
 	void applyForce(Vec2 force);
 	void applyImpulse(Vec2 impulse);
-	Sprite* getUpdateSprite();
+	Sprite* getSprite();
+	Sprite* updateSprite();
 	float getMass();
 	Vec2 getPos();
 	Vec2 getVel();

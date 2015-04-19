@@ -19,7 +19,13 @@ Entity* Entity::makeStar(b2World* world, float density, Vec2 pos, Sprite* sprite
 	return new Star(world, BodyUtil::createCircularBody(world, density, pos, sprite));
 }
 
-Sprite* Entity::getUpdateSprite()
+Sprite* Entity::getSprite()
+{
+    Sprite* data = (Sprite*)body->GetUserData();
+    return data;
+}
+
+Sprite* Entity::updateSprite()
 {
     Sprite* data = (Sprite*)body->GetUserData();
     data->setPosition(Vec2(body->GetPosition().x, body->GetPosition().y));

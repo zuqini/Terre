@@ -1,11 +1,11 @@
 # Terre
-Terre is a sci-fi exploration game set in outer-space for the Android platform.
+Terre is a sci-fi strategy game set in outer-space for the Android platform.
 
 Terre simulates realistic gravitational pull and dynamic lighting.
 
 ## Screenshots
-![Sample-Far](https://cloud.githubusercontent.com/assets/5790854/7196367/7b2b775a-e49e-11e4-870d-9e2890d35ddf.png)
-![Sample-Close](https://cloud.githubusercontent.com/assets/5790854/7196368/7b2c28bc-e49e-11e4-9c56-842b0d8d540f.png)
+![screenshot_2015-04-18-20-30-02](https://cloud.githubusercontent.com/assets/5790854/7217902/4349e566-e619-11e4-84c0-8934651018b0.png)
+![screenshot_2015-04-18-20-30-12](https://cloud.githubusercontent.com/assets/5790854/7217903/434aa08c-e619-11e4-8f37-6d75e8cb78f7.png)
 
 ## History
 For previous development history, refer to [Drillbit][1].

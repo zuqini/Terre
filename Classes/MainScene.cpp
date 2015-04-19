@@ -4,7 +4,7 @@
 #define WORLD 0
 #define DRAW 1
 
-#define ZOOM_MULTIPLIER 0.005f
+#define ZOOM_MULTIPLIER 0.001f
 
 USING_NS_CC;
 
@@ -58,8 +58,9 @@ bool MainScene::init()
     auto drawNode = DrawNode::create();
     world->addChild(drawNode, 10, DRAW);
     for (std::vector<Entity*>::const_iterator iterator = entities.begin(); iterator != entities.end(); ++iterator) {
-    	world->addChild((*iterator)->getUpdateSprite());
+    	world->addChild((*iterator)->getSprite());
     }
+    scaleCenter(world, 0.08, origin);
     this->addChild(world, 0 , WORLD);
     this->scheduleUpdate();
     return true;
@@ -72,7 +73,7 @@ void MainScene::scaleCenter(Node* node, float scale, Vec2 center)
     // Set the scale.
     node->setScale(scale);
 
-    Vec2 currCenter = scale * center;
+    Vec2 currCenter = node->getScale() * center;
     Vec2 centerPointDelta = initCenter - currCenter;
     node->setPosition(node->getPosition() + centerPointDelta);
 }
@@ -97,11 +98,13 @@ void MainScene::onTouchesMoved(std::vector<Touch*> touches, Event* event)
 		Vec2 currT1 = touches[0]->getLocation();
 		Vec2 currT2 = touches[1]->getLocation();
 		float currDist = currT1.distance(currT2);
-
-		float distDelta = initDist - currDist;
+		float distDelta = currDist - initDist;
 		Vec2 pinchCenter = initT1.getMidpoint(initT2);
-
-		scaleCenter(world, world->getScale() - distDelta * ZOOM_MULTIPLIER, pinchCenter);
+		pinchCenter = world->convertToNodeSpace(pinchCenter);
+		float zoom = world->getScale() + distDelta * ZOOM_MULTIPLIER;
+		zoom = zoom < 0.015 ? 0.015 : zoom;
+		zoom = zoom > 0.3 ? 0.3 : zoom;
+		scaleCenter(world, zoom, pinchCenter);
 	}
 }
 
@@ -134,11 +137,13 @@ void MainScene::onTouchCancelled(Touch* touch, Event* event)
 
 /**
  * @TODO
- * this method could(should) be improved.
+ * this method MUST be improved.
  */
-void MainScene::intensifyLight(struct LightRay ray1, struct LightRay ray2)
+void MainScene::drawLight(struct LightRay ray1, struct LightRay ray2, Star* star)
 {
 	auto drawNode = (DrawNode*)this->getChildByTag(WORLD)->getChildByTag(DRAW);
+
+	Color3B color = star->getSprite()->getColor();
 
 	auto length1 = ray1.frac < 1 ? ray1.frac : 1;
 	auto length2 = ray2.frac < 1 ? ray2.frac : 1;
@@ -152,27 +157,27 @@ void MainScene::intensifyLight(struct LightRay ray1, struct LightRay ray2)
 	Vec2 verts[3] = {
 			source, p1, p2
 	};
-	drawNode->drawPolygon(verts, 3, Color4F(1, 1, 0, 1), 0, Color4F::BLACK);
+	drawNode->drawPolygon(verts, 3, Color4F(color.r, color.g, color.b, 1), 0, Color4F(0, 0, 0, 0));
 
 	Vec2 p3;
 	Vec2 p4;
 	auto factor = 0;
 	while(length1 <= ray1.frac || length2 <= ray2.frac)
 	{
-		auto length  = pow(1.02, factor);
+		auto length  = pow(1.05, factor);
 		length1 = length1 + length < ray1.frac ? length1 + length : ray1.frac;
 		length2 = length2 + length < ray2.frac ? length2 + length : ray2.frac;
 
 		p3 = ray1.p1 + (ray1.p2 - ray1.p1) * length1;
 		p4 = ray2.p1 + (ray2.p2 - ray2.p1) * length2;
-		auto strength = pow(0.97, factor++);
-		if(strength < 0.005) {
+		auto strength = pow(0.94, factor++);
+		if(strength < 0.001) {
 			break;
 		}
-		Vec2 verts1[4] = {
+		Vec2 verts[4] = {
 			p1, p3, p4, p2
 		};
-		drawNode->drawPolygon(verts1, 4, Color4F(1, 1, 0, strength), 0, Color4F(0,0,0,0));
+		drawNode->drawPolygon(verts, 4, Color4F(color.r, color.g, color.b, strength), 0, Color4F(0,0,0,0));
 		p1 = Vec2(p3);
 		p2 = Vec2(p4);
 
@@ -189,18 +194,23 @@ void MainScene::update(float dt){
 		accumulator -= delta;
 	}
 	universe.updatePos();
-	std::vector<struct LightRay> rays = universe.getRays();
-	auto length = rays.size();
 
 	auto drawNode = (DrawNode*)this->getChildByTag(WORLD)->getChildByTag(DRAW);
 	drawNode->clear();
-	//drawNode->drawLine(rays[0].p1, rays[0].p2 + (rays[0].p2 - rays[0].p1) * rays[0].frac, Color4F::GREEN);
-	for(auto i = 1; i < length; i++)
+	std::vector<Star*> stars = universe.getStars();
+	auto numOfStars = stars.size();
+	for(auto i = 0; i < numOfStars; i++)
 	{
-		intensifyLight(rays[i-1], rays[i]);
-		//drawNode->drawLine(rays[i].p1, rays[i].p2 + (rays[i].p2 - rays[i].p1) * rays[i].frac, Color4F::GREEN);
+		std::vector<struct LightRay> rays = universe.getRaysforSource(stars[i]);
+		auto numOfRays = rays.size();
+		//drawNode->drawLine(rays[0].p1, rays[0].p2 + (rays[0].p2 - rays[0].p1) * rays[0].frac, Color4F::GREEN);
+		for(auto j = 1; j < numOfRays; j++)
+		{
+			drawLight(rays[j-1], rays[j], stars[i]);
+			//drawNode->drawLine(rays[i].p1, rays[i].p2 + (rays[i].p2 - rays[i].p1) * rays[i].frac, Color4F::GREEN);
+		}
+		drawLight(rays[0], rays[numOfRays - 1], stars[i]);
 	}
-	intensifyLight(rays[0], rays[length - 1]);
 }
 
 void MainScene::menuCloseCallback(Ref* pSender)

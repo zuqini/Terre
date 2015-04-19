@@ -12,7 +12,7 @@ public:
     virtual bool init();
     void menuCloseCallback(cocos2d::Ref* pSender);
     void addEntitySubs(Entity* entity);
-    void intensifyLight(struct LightRay ray1, struct LightRay ray2);
+    void drawLight(struct LightRay ray1, struct LightRay ray2, Star* star);
     void update(float) override;
 
     virtual bool onTouchBegan(cocos2d::Touch*, cocos2d::Event*);
@@ -29,9 +29,9 @@ public:
 private:
     void scaleCenter(cocos2d::Node*, float, cocos2d::Vec2);
 
-    double accumulator;
     Universe universe;
 
+    double accumulator;
     const double delta = 1./60;
 };
 

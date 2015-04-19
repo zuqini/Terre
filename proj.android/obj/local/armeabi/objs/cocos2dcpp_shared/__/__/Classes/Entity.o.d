@@ -386,7 +386,7 @@ obj/local/armeabi/objs/cocos2dcpp_shared/__/__/Classes/Entity.o: \
  jni/../../cocos2d/external/flatbuffers/../Box2D/Dynamics/Joints/b2RopeJoint.h \
  jni/../../cocos2d/external/flatbuffers/../Box2D/Dynamics/Joints/b2WeldJoint.h \
  jni/../../cocos2d/external/flatbuffers/../Box2D/Dynamics/Joints/b2WheelJoint.h \
- jni/../../Classes/Star.h jni/../../Classes/BodyFactory.h
+ jni/../../Classes/Star.h jni/../../Classes/BodyUtil.h
 
 jni/../../cocos2d/cocos/3d/../cocos2d.h:
 
@@ -1166,4 +1166,4 @@ jni/../../cocos2d/external/flatbuffers/../Box2D/Dynamics/Joints/b2WheelJoint.h:
 
 jni/../../Classes/Star.h:
 
-jni/../../Classes/BodyFactory.h:
+jni/../../Classes/BodyUtil.h:

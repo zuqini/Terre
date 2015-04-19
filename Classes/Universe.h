@@ -19,7 +19,7 @@ public:
 	void updatePos();
 private:
 	Entity* addEntity(Entity* entity);
-	void generateSystem(Vec2 origin, Size visibleSize);
+	void generateSystem(Vec2 origin, Size visibleSize, int starOpt);
 	void applyGravity();
 
 	std::vector<Entity*> entities;

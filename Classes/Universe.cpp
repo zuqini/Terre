@@ -26,7 +26,7 @@ void Universe::step(float delta)
 	world->Step(delta, 8, 3);
 }
 
-void Universe::generateSystem(Vec2 origin, Size visibleSize)
+void Universe::generateSystem(Vec2 origin, Size visibleSize, int starOpt)
 {
 	/**
 	 * @TODO
@@ -35,21 +35,27 @@ void Universe::generateSystem(Vec2 origin, Size visibleSize)
 
 	srand (time(0));
 	Sprite* starSprite;
-	switch(rand() % 2)
+	switch(starOpt)
 	{
 	case 0:
 		starSprite = Sprite::create("Star00.png");
+		starSprite->setColor(Color3B(1,1,0));
 		break;
 	case 1:
 		starSprite = Sprite::create("Star01.png");
+		starSprite->setColor(Color3B(0,0,1));
+		break;
+	case 2:
+		starSprite = Sprite::create("Star01.png");
+		starSprite->setColor(Color3B(1,0,0));
 		break;
 	}
-	Entity* star = addEntity(Entity::makeStar(world, 100000, Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y), starSprite));
-	DynamicLightWorld::addSource(star);
+	Star* star = (Star*)addEntity(Entity::makeStar(world, 100000, Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y), starSprite));
+	addStar(star);
 	Vec2 currPos = star->getPos();
 	currPos.add(Vec2(300,0));
 	Sprite* planetSprite;
-	int planetCount = rand() % 10 + 4;
+	int planetCount = rand() % 4 + 4;
 	for(auto i = 0; i < planetCount; ++i)
 	{
 		currPos.add(Vec2(i*200,0));
@@ -69,14 +75,16 @@ void Universe::generateSystem(Vec2 origin, Size visibleSize)
 			break;
 		}
 		Planet* currPlanet = (Planet*)addEntity(Entity::makePlanet(world, rand() % 1000 + 500, currPos, planetSprite));
-		DynamicLightWorld::addPlanet(currPlanet);
+		addPlanet(currPlanet);
 		currPlanet->applyImpulse(Vec2(0,currPlanet->getMass() * sqrt(G_CONSTANT * star->getMass() / star->getPos().getDistance(currPlanet->getPos()))));
 	}
 }
 
 void Universe::generateEntities(Vec2 origin, Size visibleSize)
 {
-	generateSystem(origin, visibleSize);	//Apply more times at different locations to generate more systems
+	generateSystem(origin, visibleSize, 2);	//Apply more times at different locations to generate more systems
+	generateSystem(origin + Vec2(10000,10000), visibleSize, 0);	//Apply more times at different locations to generate more systems
+	generateSystem(origin + Vec2(20000,0), visibleSize, 1);	//Apply more times at different locations to generate more systems
 }
 
 void Universe::applyGravity()
@@ -103,7 +111,7 @@ void Universe::applyGravity()
 void Universe::updatePos()
 {
 	for(auto i = 0; i < entities.size(); ++i) {
-		entities[i]->getUpdateSprite();
+		entities[i]->updateSprite();
 	}
 }
 
