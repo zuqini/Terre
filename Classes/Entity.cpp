@@ -28,7 +28,8 @@ Sprite* Entity::getSprite()
 Sprite* Entity::updateSprite()
 {
     Sprite* data = (Sprite*)body->GetUserData();
-    data->setPosition(Vec2(body->GetPosition().x, body->GetPosition().y));
+    Vec2 pos = Vec2(body->GetPosition().x, body->GetPosition().y);
+    data->setPosition(pos);
     return data;
 }
 

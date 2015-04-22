@@ -349,7 +349,8 @@ obj/local/armeabi/objs/cocos2dcpp_shared/__/__/Classes/MainScene.o: \
  jni/../../cocos2d/cocos/3d/../deprecated/CCString.h \
  jni/../../cocos2d/cocos/3d/../deprecated/CCNotificationCenter.h \
  jni/../../cocos2d/cocos/3d/../deprecated/CCDeprecated.h \
- jni/../../Classes/Universe.h jni/../../cocos2d/external/Box2D/Box2D.h \
+ jni/../../Classes/Select.h jni/../../Classes/Universe.h \
+ jni/../../cocos2d/external/Box2D/Box2D.h \
  jni/../../cocos2d/external/flatbuffers/../Box2D/Common/b2Settings.h \
  jni/../../cocos2d/external/flatbuffers/../Box2D/Common/b2Draw.h \
  jni/../../cocos2d/external/flatbuffers/../Box2D/Common/b2Math.h \
@@ -1089,6 +1090,8 @@ jni/../../cocos2d/cocos/3d/../deprecated/CCString.h:
 jni/../../cocos2d/cocos/3d/../deprecated/CCNotificationCenter.h:
 
 jni/../../cocos2d/cocos/3d/../deprecated/CCDeprecated.h:
+
+jni/../../Classes/Select.h:
 
 jni/../../Classes/Universe.h:
 

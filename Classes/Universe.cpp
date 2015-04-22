@@ -14,6 +14,31 @@ Universe::Universe() : DynamicLightWorld()
 	world = new b2World(gravity);
 }
 
+Star* Universe::createStarAt(Vec2 loc)
+{
+	srand (time(0));
+	Sprite* starSprite;
+	auto starOpt = rand() % 3 + 0;
+	switch(starOpt)
+	{
+	case 0:
+		starSprite = Sprite::create("Star00.png");
+		starSprite->setColor(Color3B(1,1,0));
+		break;
+	case 1:
+		starSprite = Sprite::create("Star01.png");
+		starSprite->setColor(Color3B(0,0,1));
+		break;
+	case 2:
+		starSprite = Sprite::create("Star02.png");
+		starSprite->setColor(Color3B(1,0,0));
+		break;
+	}
+	Star* star = (Star*)addEntity(Entity::makeStar(world, 100000, loc, starSprite));
+	addStar(star);
+	return star;
+}
+
 Entity* Universe::addEntity(Entity* entity)
 {
 	entities.push_back(entity);
@@ -46,7 +71,7 @@ void Universe::generateSystem(Vec2 origin, Size visibleSize, int starOpt)
 		starSprite->setColor(Color3B(0,0,1));
 		break;
 	case 2:
-		starSprite = Sprite::create("Star01.png");
+		starSprite = Sprite::create("Star02.png");
 		starSprite->setColor(Color3B(1,0,0));
 		break;
 	}
@@ -110,7 +135,8 @@ void Universe::applyGravity()
 
 void Universe::updatePos()
 {
-	for(auto i = 0; i < entities.size(); ++i) {
+	int length = entities.size();
+	for(auto i = 0; i < length; ++i) {
 		entities[i]->updateSprite();
 	}
 }

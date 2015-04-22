@@ -2,7 +2,7 @@
 #define __MAIN_SCENE_H__
 
 #include "cocos2d.h"
-
+#include "Select.h"
 #include "Universe.h"
 
 class MainScene : public cocos2d::Layer
@@ -27,6 +27,14 @@ public:
 
     CREATE_FUNC(MainScene);
 private:
+    Select _selected;
+
+    MenuItemImage* _starUnselect;
+    MenuItemImage* _starSelect;
+
+    MenuItemImage* _planetUnselect;
+    MenuItemImage* _planetSelect;
+
     void scaleCenter(cocos2d::Node*, float, cocos2d::Vec2);
 
     Universe universe;

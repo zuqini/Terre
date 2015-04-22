@@ -1,4 +1,5 @@
 #include "MainScene.h"
+#include "Select.h"
 #include "LightRay.h"
 
 #define WORLD 0
@@ -32,7 +33,7 @@ bool MainScene::init()
     {
         return false;
     }
-
+    _selected = NONE;
     auto touchListener = EventListenerTouchOneByOne::create();
     auto multiTouchListener = EventListenerTouchAllAtOnce::create();
 
@@ -65,31 +66,31 @@ bool MainScene::init()
     scaleCenter(world, 0.3, origin);
 
     // add a "close" icon to exit the progress. it's an autorelease object
-	auto starUnselect = MenuItemImage::create(
+	_starUnselect = MenuItemImage::create(
 							   "starNormal.png",
 							   "starSelect.png",
 							   CC_CALLBACK_1(MainScene::starCallBack, this));
 
-	auto starSelect = MenuItemImage::create(
+	_starSelect = MenuItemImage::create(
 							   "starFinal.png",
 							   "starSelect.png",
 							   CC_CALLBACK_1(MainScene::starCallBack, this));
 
-	MenuItemToggle* starButton = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::starCallBack, this), starUnselect, starSelect, NULL);
+	MenuItemToggle* starButton = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::starCallBack, this), _starUnselect, _starSelect, NULL);
 	starButton->setPosition(Vec2(origin.x + visibleSize.width - starButton->getContentSize().width,
 								origin.y + starButton->getContentSize().height));
 
-	auto planetUnselect = MenuItemImage::create(
+	_planetUnselect = MenuItemImage::create(
 							   "planetNormal.png",
 							   "planetSelect.png",
 							   CC_CALLBACK_1(MainScene::planetCallBack, this));
 
-	auto planetSelect = MenuItemImage::create(
+	_planetSelect = MenuItemImage::create(
 							   "planetFinal.png",
 							   "planetSelect.png",
 							   CC_CALLBACK_1(MainScene::planetCallBack, this));
 
-	MenuItemToggle* planetButton = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::planetCallBack, this), planetUnselect, planetSelect, NULL);
+	MenuItemToggle* planetButton = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::planetCallBack, this), _planetUnselect, _planetSelect, NULL);
 	planetButton->setPosition(Vec2(origin.x + visibleSize.width - planetButton->getContentSize().width,
 								origin.y + 150 + planetButton->getContentSize().height));
 
@@ -158,16 +159,27 @@ bool MainScene::onTouchBegan(Touch* touch, Event* event)
 
 void MainScene::onTouchEnded(Touch* touch, Event* event)
 {
+	if(_selected == STAR)
+	{
+		auto world = this->getChildByTag(WORLD);
+		Vec2 loc = touch->getLocation();
+		loc = world->convertToNodeSpace(loc);
+		universe.createStarAt(loc);
+		log("success");
+	}
 }
 
 void MainScene::onTouchMoved(Touch* touch, Event* event)
 {
-	auto world = this->getChildByTag(WORLD);
-	//move
-	Vec2 diff = touch->getDelta();
-	Vec2 currPos = world->getPosition();
-	currPos.add(diff);
-	world->setPosition(currPos);
+	if(_selected == NONE)
+	{
+		auto world = this->getChildByTag(WORLD);
+		//move
+		Vec2 diff = touch->getDelta();
+		Vec2 currPos = world->getPosition();
+		currPos.add(diff);
+		world->setPosition(currPos);
+	}
 }
 
 void MainScene::onTouchCancelled(Touch* touch, Event* event)
@@ -176,7 +188,6 @@ void MainScene::onTouchCancelled(Touch* touch, Event* event)
 
 void MainScene::update(float dt){
 	auto drawNode = (DrawNode*)this->getChildByTag(WORLD)->getChildByTag(DRAW);
-
 	accumulator += dt;
 	while(accumulator > delta)
 	{
@@ -189,6 +200,11 @@ void MainScene::update(float dt){
 
 void MainScene::starCallBack(Ref* pSender)
 {
+	MenuItemToggle* starButton = (MenuItemToggle *)(pSender);
+	if(starButton->getSelectedItem() == _starSelect)
+	{
+		_selected = STAR;
+	}
 }
 
 void MainScene::planetCallBack(Ref* pSender)
