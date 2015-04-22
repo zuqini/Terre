@@ -170,3 +170,72 @@ std::vector<struct LightRay> DynamicLightWorld::getRaysforSource(Entity* source)
 	std::sort (rays.begin(), rays.end(), sortByRadian);
 	return rays;
 }
+
+/**
+ * @TODO
+ * Dynamic lighting needs to be better
+ * re-implement this method with opengl shaders
+ */
+void DynamicLightWorld::drawLight(DrawNode* drawNode, struct LightRay ray1, struct LightRay ray2, Star* star)
+{
+	Color3B color = star->getSprite()->getColor();
+
+	auto length1 = ray1.frac < 1 ? ray1.frac : 1;
+	auto length2 = ray2.frac < 1 ? ray2.frac : 1;
+
+	Vec2 source = ray1.p1;
+	Vec2 p1 = ray1.p1 + (ray1.p2 - ray1.p1) * length1;
+	Vec2 p2 = ray2.p1 + (ray2.p2 - ray2.p1) * length2;
+	float fracUnit1 = ray1.p2.getDistance(ray1.p1);
+	float fracUnit2 = ray2.p2.getDistance(ray2.p1);
+
+	Vec2 verts[3] = {
+			source, p1, p2
+	};
+	drawNode->drawPolygon(verts, 3, Color4F(color.r, color.g, color.b, 1), 0, Color4F(0, 0, 0, 0));
+
+	Vec2 p3;
+	Vec2 p4;
+	auto lengthFactor = 0;
+	auto strengthFactor = 0;
+	while(length1 <= ray1.frac || length2 <= ray2.frac)
+	{
+		auto length  = pow(1.05, lengthFactor++);
+		length1 = length1 + length < ray1.frac ? length1 + length : ray1.frac;
+		length2 = length2 + length < ray2.frac ? length2 + length : ray2.frac;
+
+		p3 = ray1.p1 + (ray1.p2 - ray1.p1) * length1;
+		p4 = ray2.p1 + (ray2.p2 - ray2.p1) * length2;
+		auto strength = pow(0.94, strengthFactor++);
+		if(strength < 0.001) {
+			break;
+		}
+		Vec2 verts[4] = {
+			p1, p3, p4, p2
+		};
+		drawNode->drawPolygon(verts, 4, Color4F(color.r, color.g, color.b, strength), 0, Color4F(0,0,0,0));
+		p1 = Vec2(p3);
+		p2 = Vec2(p4);
+
+		if(length1 == ray1.frac || length2 == ray2.frac)
+			break;
+	}
+}
+
+void DynamicLightWorld::updateLight(DrawNode* drawNode) {
+	drawNode->clear();
+	std::vector<Star*> stars = getStars();
+	auto numOfStars = stars.size();
+	for(auto i = 0; i < numOfStars; i++)
+	{
+		std::vector<struct LightRay> rays = getRaysforSource(stars[i]);
+		auto numOfRays = rays.size();
+		//drawNode->drawLine(rays[0].p1, rays[0].p2 + (rays[0].p2 - rays[0].p1) * rays[0].frac, Color4F::GREEN);
+		for(auto j = 1; j < numOfRays; j++)
+		{
+			drawLight(drawNode, rays[j-1], rays[j], stars[i]);
+			//drawNode->drawLine(rays[i].p1, rays[i].p2 + (rays[i].p2 - rays[i].p1) * rays[i].frac, Color4F::GREEN);
+		}
+		drawLight(drawNode, rays[0], rays[numOfRays - 1], stars[i]);
+	}
+}

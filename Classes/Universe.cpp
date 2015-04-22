@@ -55,7 +55,7 @@ void Universe::generateSystem(Vec2 origin, Size visibleSize, int starOpt)
 	Vec2 currPos = star->getPos();
 	currPos.add(Vec2(300,0));
 	Sprite* planetSprite;
-	int planetCount = rand() % 4 + 4;
+	int planetCount = rand() % 2 + 4;
 	for(auto i = 0; i < planetCount; ++i)
 	{
 		currPos.add(Vec2(i*200,0));
@@ -83,8 +83,8 @@ void Universe::generateSystem(Vec2 origin, Size visibleSize, int starOpt)
 void Universe::generateEntities(Vec2 origin, Size visibleSize)
 {
 	generateSystem(origin, visibleSize, 2);	//Apply more times at different locations to generate more systems
-	generateSystem(origin + Vec2(10000,10000), visibleSize, 0);	//Apply more times at different locations to generate more systems
-	generateSystem(origin + Vec2(20000,0), visibleSize, 1);	//Apply more times at different locations to generate more systems
+	//generateSystem(origin + Vec2(10000,10000), visibleSize, 0);	//Apply more times at different locations to generate more systems
+	//generateSystem(origin + Vec2(20000,0), visibleSize, 1);	//Apply more times at different locations to generate more systems
 }
 
 void Universe::applyGravity()

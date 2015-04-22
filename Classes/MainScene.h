@@ -10,9 +10,10 @@ class MainScene : public cocos2d::Layer
 public:
     static cocos2d::Scene* createScene();
     virtual bool init();
-    void menuCloseCallback(cocos2d::Ref* pSender);
+    void starCallBack(cocos2d::Ref* pSender);
+    void planetCallBack(cocos2d::Ref* pSender);
+    void toolBarCallBack(cocos2d::Ref* pSender);
     void addEntitySubs(Entity* entity);
-    void drawLight(struct LightRay ray1, struct LightRay ray2, Star* star);
     void update(float) override;
 
     virtual bool onTouchBegan(cocos2d::Touch*, cocos2d::Event*);
