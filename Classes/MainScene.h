@@ -12,7 +12,6 @@ public:
     virtual bool init();
     void starCallBack(cocos2d::Ref* pSender);
     void planetCallBack(cocos2d::Ref* pSender);
-    void toolBarCallBack(cocos2d::Ref* pSender);
     void addEntitySubs(Entity* entity);
     void update(float) override;
 

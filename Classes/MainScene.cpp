@@ -65,23 +65,40 @@ bool MainScene::init()
     scaleCenter(world, 0.3, origin);
 
     // add a "close" icon to exit the progress. it's an autorelease object
-	auto starButton = MenuItemImage::create(
+	auto starUnselect = MenuItemImage::create(
 							   "starNormal.png",
 							   "starSelect.png",
 							   CC_CALLBACK_1(MainScene::starCallBack, this));
 
-	auto planetButton = MenuItemImage::create(
-								   "starNormal.png",
-								   "starSelect.png",
-								   CC_CALLBACK_1(MainScene::planetCallBack, this));
-	MenuItemToggle* toolBar = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::toolBarCallBack, this), starButton, planetButton, NULL);
-	toolBar->setPosition(Vec2(origin.x + visibleSize.width - toolBar->getContentSize().width,
-								origin.y + toolBar->getContentSize().height));
+	auto starSelect = MenuItemImage::create(
+							   "starFinal.png",
+							   "starSelect.png",
+							   CC_CALLBACK_1(MainScene::starCallBack, this));
+
+	MenuItemToggle* starButton = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::starCallBack, this), starUnselect, starSelect, NULL);
+	starButton->setPosition(Vec2(origin.x + visibleSize.width - starButton->getContentSize().width,
+								origin.y + starButton->getContentSize().height));
+
+	auto planetUnselect = MenuItemImage::create(
+							   "planetNormal.png",
+							   "planetSelect.png",
+							   CC_CALLBACK_1(MainScene::planetCallBack, this));
+
+	auto planetSelect = MenuItemImage::create(
+							   "planetFinal.png",
+							   "planetSelect.png",
+							   CC_CALLBACK_1(MainScene::planetCallBack, this));
+
+	MenuItemToggle* planetButton = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::planetCallBack, this), planetUnselect, planetSelect, NULL);
+	planetButton->setPosition(Vec2(origin.x + visibleSize.width - planetButton->getContentSize().width,
+								origin.y + 150 + planetButton->getContentSize().height));
 
 	// create menu, it's an autorelease object
-	auto overlay = Menu::create(toolBar, NULL);
-	overlay->setPosition(Vec2::ZERO);
-	this->addChild(overlay, 1, OVERLAY);
+	auto overLay = Menu::create();
+	overLay->addChild(starButton);
+	overLay->addChild(planetButton);
+	overLay->setPosition(Vec2::ZERO);
+	this->addChild(overLay, 1, OVERLAY);
 
     this->addChild(world, 0 , WORLD);
     this->scheduleUpdate();
@@ -172,15 +189,8 @@ void MainScene::update(float dt){
 
 void MainScene::starCallBack(Ref* pSender)
 {
-	log("Pressed!");
 }
 
 void MainScene::planetCallBack(Ref* pSender)
 {
-	log("Pressed!");
-}
-
-void MainScene::toolBarCallBack(Ref* pSender)
-{
-	log("Pressed!");
 }
