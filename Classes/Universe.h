@@ -15,6 +15,7 @@ public:
 	Universe();
 	void generateEntities(Vec2 origin, Size visibleSize);
 	Star* createStarAt(Vec2 location);
+	Planet* createPlanetAt(Vec2 location);
 	std::vector<Entity*> getEntities();
 	void step(float delta);
 	void updatePos();

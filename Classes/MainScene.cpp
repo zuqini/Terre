@@ -2,6 +2,9 @@
 #include "Select.h"
 #include "LightRay.h"
 
+#define UNSELECT 0
+#define SELECT 1
+
 #define WORLD 0
 #define OVERLAY 1
 
@@ -76,9 +79,9 @@ bool MainScene::init()
 							   "starSelect.png",
 							   CC_CALLBACK_1(MainScene::starCallBack, this));
 
-	MenuItemToggle* starButton = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::starCallBack, this), _starUnselect, _starSelect, NULL);
-	starButton->setPosition(Vec2(origin.x + visibleSize.width - starButton->getContentSize().width,
-								origin.y + starButton->getContentSize().height));
+	_starToggle = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::starCallBack, this), _starUnselect, _starSelect, NULL);
+	_starToggle->setPosition(Vec2(origin.x + visibleSize.width - _starToggle->getContentSize().width,
+								origin.y + _starToggle->getContentSize().height));
 
 	_planetUnselect = MenuItemImage::create(
 							   "planetNormal.png",
@@ -89,15 +92,14 @@ bool MainScene::init()
 							   "planetFinal.png",
 							   "planetSelect.png",
 							   CC_CALLBACK_1(MainScene::planetCallBack, this));
-
-	MenuItemToggle* planetButton = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::planetCallBack, this), _planetUnselect, _planetSelect, NULL);
-	planetButton->setPosition(Vec2(origin.x + visibleSize.width - planetButton->getContentSize().width,
-								origin.y + 150 + planetButton->getContentSize().height));
+	_planetToggle = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::planetCallBack, this), _planetUnselect, _planetSelect, NULL);
+	_planetToggle->setPosition(Vec2(origin.x + visibleSize.width - _planetToggle->getContentSize().width,
+								origin.y + 150 + _planetToggle->getContentSize().height));
 
 	// create menu, it's an autorelease object
 	auto overLay = Menu::create();
-	overLay->addChild(starButton);
-	overLay->addChild(planetButton);
+	overLay->addChild(_starToggle);
+	overLay->addChild(_planetToggle);
 	overLay->setPosition(Vec2::ZERO);
 	this->addChild(overLay, 1, OVERLAY);
 
@@ -159,12 +161,13 @@ bool MainScene::onTouchBegan(Touch* touch, Event* event)
 
 void MainScene::onTouchEnded(Touch* touch, Event* event)
 {
-	if(_selected == STAR)
+	if(_selected == STAR || _selected == PLANET)
 	{
 		auto world = this->getChildByTag(WORLD);
 		Vec2 loc = touch->getLocation();
 		loc = world->convertToNodeSpace(loc);
-		universe.createStarAt(loc);
+
+		_selected == STAR ? world->addChild(universe.createStarAt(loc)->getSprite()) : world->addChild(universe.createPlanetAt(loc)->getSprite());
 		log("success");
 	}
 }
@@ -200,13 +203,26 @@ void MainScene::update(float dt){
 
 void MainScene::starCallBack(Ref* pSender)
 {
-	MenuItemToggle* starButton = (MenuItemToggle *)(pSender);
-	if(starButton->getSelectedItem() == _starSelect)
+	MenuItemToggle* starToggle = (MenuItemToggle *)(pSender);
+	if(starToggle->getSelectedItem() == _starSelect)
 	{
 		_selected = STAR;
+		_planetToggle->setSelectedIndex(UNSELECT);
+	} else if(starToggle->getSelectedItem() == _starUnselect)
+	{
+		_selected = NONE;
 	}
 }
 
 void MainScene::planetCallBack(Ref* pSender)
 {
+	MenuItemToggle* planetToggle = (MenuItemToggle *)(pSender);
+	if(planetToggle->getSelectedItem() == _planetSelect)
+	{
+		_selected = PLANET;
+		_starToggle->setSelectedIndex(UNSELECT);
+	} else if(planetToggle->getSelectedItem() == _planetUnselect)
+	{
+		_selected = NONE;
+	}
 }

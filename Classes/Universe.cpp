@@ -39,6 +39,30 @@ Star* Universe::createStarAt(Vec2 loc)
 	return star;
 }
 
+Planet* Universe::createPlanetAt(Vec2 loc)
+{
+	srand (time(0));
+	Sprite* planetSprite;
+	switch(rand() % 4)
+	{
+	case 0:
+		planetSprite = Sprite::create("Planet00.png");
+		break;
+	case 1:
+		planetSprite = Sprite::create("Planet01.png");
+		break;
+	case 2:
+		planetSprite = Sprite::create("Planet02.png");
+		break;
+	case 3:
+		planetSprite = Sprite::create("Planet03.png");
+		break;
+	}
+	Planet* currPlanet = (Planet*)addEntity(Entity::makePlanet(world, rand() % 1000 + 500, loc, planetSprite));
+	addPlanet(currPlanet);
+	return currPlanet;
+}
+
 Entity* Universe::addEntity(Entity* entity)
 {
 	entities.push_back(entity);
@@ -58,25 +82,7 @@ void Universe::generateSystem(Vec2 origin, Size visibleSize, int starOpt)
 	 * there's a better way to pseudorandom generate in C++11
 	 */
 
-	srand (time(0));
-	Sprite* starSprite;
-	switch(starOpt)
-	{
-	case 0:
-		starSprite = Sprite::create("Star00.png");
-		starSprite->setColor(Color3B(1,1,0));
-		break;
-	case 1:
-		starSprite = Sprite::create("Star01.png");
-		starSprite->setColor(Color3B(0,0,1));
-		break;
-	case 2:
-		starSprite = Sprite::create("Star02.png");
-		starSprite->setColor(Color3B(1,0,0));
-		break;
-	}
-	Star* star = (Star*)addEntity(Entity::makeStar(world, 100000, Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y), starSprite));
-	addStar(star);
+	Star* star = createStarAt(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
 	Vec2 currPos = star->getPos();
 	currPos.add(Vec2(300,0));
 	Sprite* planetSprite;

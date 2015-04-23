@@ -29,9 +29,11 @@ public:
 private:
     Select _selected;
 
+    MenuItemToggle* _starToggle;
     MenuItemImage* _starUnselect;
     MenuItemImage* _starSelect;
 
+    MenuItemToggle* _planetToggle;
     MenuItemImage* _planetUnselect;
     MenuItemImage* _planetSelect;
 

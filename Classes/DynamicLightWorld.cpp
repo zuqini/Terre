@@ -127,19 +127,18 @@ std::vector<struct LightRay> DynamicLightWorld::getRaysforSource(Entity* source)
 		LightRay ray;
 		ray.p1 = Vec2(inputPlanet[i].p1.x, inputPlanet[i].p1.y);
 		ray.p2 = Vec2(inputPlanet[i].p2.x, inputPlanet[i].p2.y);
+		ray.frac = inputPlanet[i].maxFraction;
+		ray.normal = Vec2::ZERO;
 		for(auto j = 0; j < numOfPlanets; j++)
 		{
 			b2RayCastOutput output;
 			if (planets[j]->castRay(&output, inputPlanet[i]))
 			{
-				ray.frac = output.fraction;
-				ray.normal = Vec2(output.normal.x, output.normal.y);
-				break;
-			}
-			else if (j == numOfPlanets - 1)
-			{
-				ray.frac = inputPlanet[i].maxFraction;
-				ray.normal = Vec2::ZERO;
+				if(output.fraction < ray.frac)
+				{
+					ray.frac = output.fraction;
+					ray.normal = Vec2(output.normal.x, output.normal.y);
+				}
 			}
 		}
 		rays.push_back(ray);
