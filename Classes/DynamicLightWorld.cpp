@@ -170,11 +170,6 @@ std::vector<struct LightRay> DynamicLightWorld::getRaysforSource(Entity* source)
 	return rays;
 }
 
-/**
- * @TODO
- * Dynamic lighting needs to be better
- * re-implement this method with opengl shaders
- */
 void DynamicLightWorld::drawLight(DrawNode* drawNode, struct LightRay ray1, struct LightRay ray2, Star* star)
 {
 	Color3B color = star->getSprite()->getColor();
