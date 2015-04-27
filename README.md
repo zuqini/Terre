@@ -1,5 +1,7 @@
 # Terre
-Terre is a visual simulation of star systems for mobile devices. It simulates realistic gravitational pull and dynamic lighting. Experiment by creating various star systems and observe their behaviours.
+Terre is a visual simulation of star systems for mobile devices. It simulates realistic gravitational pull and dynamic lighting. 
+
+Create various star systems and observe their behaviours!
 
 ## Instructions
 
