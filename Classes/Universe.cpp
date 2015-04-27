@@ -4,7 +4,7 @@
 #include <cmath>
 #include <ctime>
 
-#define G_CONSTANT 0.0001
+#define G_CONSTANT 0.001
 
 USING_NS_CC;
 
@@ -77,19 +77,20 @@ void Universe::step(float delta)
 
 void Universe::generateSystem(Vec2 origin, Size visibleSize, int starOpt)
 {
-	/**
-	 * @TODO
-	 * there's a better way to pseudorandom generate in C++11
+	/*
+	 * TODO
+	 * need better way to generateSystems
+	 * need to update for new gravity constant
 	 */
 
 	Star* star = createStarAt(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
 	Vec2 currPos = star->getPos();
-	currPos.add(Vec2(300,0));
+	currPos.add(Vec2(800,0));
 	Sprite* planetSprite;
 	int planetCount = rand() % 2 + 4;
 	for(auto i = 0; i < planetCount; ++i)
 	{
-		currPos.add(Vec2(i*200,0));
+		currPos.add(Vec2((i+1)*500,0));
 		switch(rand() % 4)
 		{
 		case 0:
@@ -113,6 +114,7 @@ void Universe::generateSystem(Vec2 origin, Size visibleSize, int starOpt)
 
 void Universe::generateEntities(Vec2 origin, Size visibleSize)
 {
+	//createStarAt(origin);
 	generateSystem(origin, visibleSize, 2);	//Apply more times at different locations to generate more systems
 	//generateSystem(origin + Vec2(10000,10000), visibleSize, 0);	//Apply more times at different locations to generate more systems
 	//generateSystem(origin + Vec2(20000,0), visibleSize, 1);	//Apply more times at different locations to generate more systems
@@ -120,7 +122,6 @@ void Universe::generateEntities(Vec2 origin, Size visibleSize)
 
 void Universe::applyGravity()
 {
-
 	auto length = entities.size();
 	auto r2 = 0.;
 	auto sForce = 0.;

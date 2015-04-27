@@ -8,7 +8,8 @@
 #define WORLD 0
 #define OVERLAY 1
 
-#define DRAW 0
+#define LIGHT 0
+#define HUD 1
 
 #define ZOOM_MULTIPLIER 0.0005f
 
@@ -61,10 +62,13 @@ bool MainScene::init()
 
     auto world = Node::create();
     world->setPosition(origin);
-    auto drawNode = DrawNode::create();
-    world->addChild(drawNode, 10, DRAW);
+    auto lightNode = DrawNode::create();
+    auto HUDNode = DrawNode::create();
+    world->addChild(lightNode, 10, LIGHT);
+    world->addChild(HUDNode, 11, HUD);
     for (std::vector<Entity*>::const_iterator iterator = entities.begin(); iterator != entities.end(); ++iterator) {
     	world->addChild((*iterator)->getSprite());
+    	log("ADDED SPRITE");
     }
     scaleCenter(world, 0.3, origin);
 
@@ -164,24 +168,41 @@ void MainScene::onTouchEnded(Touch* touch, Event* event)
 	if(_selected == STAR || _selected == PLANET)
 	{
 		auto world = this->getChildByTag(WORLD);
-		Vec2 loc = touch->getLocation();
-		loc = world->convertToNodeSpace(loc);
+		DrawNode* drawNode = (DrawNode*)world->getChildByTag(HUD);
+		drawNode->clear();
 
-		_selected == STAR ? world->addChild(universe.createStarAt(loc)->getSprite()) : world->addChild(universe.createPlanetAt(loc)->getSprite());
+		Vec2 start = touch->getStartLocation();
+		Vec2 end = touch->getLocation();
+		Vec2 diff = end - start;
+
+		Vec2 loc = world->convertToNodeSpace(start);
+
+		Entity* entity = _selected == STAR ? (Entity*)universe.createStarAt(loc) : (Entity*)universe.createPlanetAt(loc);
+		diff.scale(entity->getMass());
+		entity->applyImpulse(diff);
+		world->addChild(entity->getSprite());
+
 		log("success");
 	}
 }
 
 void MainScene::onTouchMoved(Touch* touch, Event* event)
 {
+	auto world = this->getChildByTag(WORLD);
 	if(_selected == NONE)
 	{
-		auto world = this->getChildByTag(WORLD);
 		//move
 		Vec2 diff = touch->getDelta();
 		Vec2 currPos = world->getPosition();
 		currPos.add(diff);
 		world->setPosition(currPos);
+	} else {
+		auto drawNode = (DrawNode*)world->getChildByTag(HUD);
+		drawNode->clear();
+		Vec2 start = world->convertToNodeSpace(touch->getStartLocation());
+		Vec2 end = world->convertToNodeSpace(touch->getLocation());
+		drawNode->drawLine(start, end, Color4F::GREEN);
+		log("%f, %f || %f, %f", start.x, start.y, end.x, end.y);
 	}
 }
 
@@ -190,7 +211,7 @@ void MainScene::onTouchCancelled(Touch* touch, Event* event)
 }
 
 void MainScene::update(float dt){
-	auto drawNode = (DrawNode*)this->getChildByTag(WORLD)->getChildByTag(DRAW);
+	auto drawNode = (DrawNode*)this->getChildByTag(WORLD)->getChildByTag(LIGHT);
 	accumulator += dt;
 	while(accumulator > delta)
 	{

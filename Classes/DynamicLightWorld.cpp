@@ -148,21 +148,28 @@ std::vector<struct LightRay> DynamicLightWorld::getRaysforSource(Entity* source)
 	auto numOfInput360 = input360.size();
 	for(auto i = 0; i < numOfInput360; i++)
 	{
-		for(auto j = 0; j < numOfPlanets; j++)
+		LightRay ray;
+		ray.p1 = Vec2(input360[i].p1.x, input360[i].p1.y);
+		ray.p2 = Vec2(input360[i].p2.x, input360[i].p2.y);
+		ray.frac = input360[i].maxFraction;
+		ray.normal = Vec2::ZERO;
+		if(numOfPlanets == 0)
 		{
-			b2RayCastOutput output;
-			if (planets[j]->castRay(&output, input360[i]))
+			rays.push_back(ray);
+		}
+		else
+		{
+			for(auto j = 0; j < numOfPlanets; j++)
 			{
-				break;
-			}
-			else if (j == numOfPlanets - 1)
-			{
-				LightRay ray;
-				ray.p1 = Vec2(input360[i].p1.x, input360[i].p1.y);
-				ray.p2 = Vec2(input360[i].p2.x, input360[i].p2.y);
-				ray.frac = input360[i].maxFraction;
-				ray.normal = Vec2::ZERO;
-				rays.push_back(ray);
+				b2RayCastOutput output;
+				if (planets[j]->castRay(&output, input360[i]))
+				{
+					break;
+				}
+				else if (j == numOfPlanets - 1)
+				{
+					rays.push_back(ray);
+				}
 			}
 		}
 	}
