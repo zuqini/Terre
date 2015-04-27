@@ -9,8 +9,8 @@ Download and install the Android application package [here](https://github.com/z
 
 * Drag to move the camera
 * Pinch to zoom in and zoom out
-* Tap the Sun symbol: ![Sun][1] to select stars
-* Tap the Earth symbol: ![Earth][2] to select planets
+* Tap the Sun symbol: ![Sun][1] to generate stars
+* Tap the Earth symbol: ![Earth][2] to generate planets
 * If either ![Sun][1] or ![Earth][2] is selected:
   * tap to generate a star/planet
   * draw a line to generate a star/planet and give it an initial velocity
