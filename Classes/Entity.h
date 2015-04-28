@@ -11,6 +11,7 @@ class Entity
 {
 public:
 	Entity(b2World* world, b2Body* body);
+	~Entity();
 	static Entity* makePlanet(b2World* world, float density, Vec2 pos, Sprite* sprite);
 	static Entity* makeStar(b2World* world, float density, Vec2 pos, Sprite* sprite);
 	void applyForce(Vec2 force);

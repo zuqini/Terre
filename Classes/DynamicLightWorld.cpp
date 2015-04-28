@@ -240,3 +240,10 @@ void DynamicLightWorld::updateLight(DrawNode* drawNode) {
 		drawLight(drawNode, rays[0], rays[numOfRays - 1], stars[i]);
 	}
 }
+
+void DynamicLightWorld::nuke()
+{
+	planets.clear();
+	stars.clear();
+	log("NUKED DYNAMIC LIGHT WORLD");
+}

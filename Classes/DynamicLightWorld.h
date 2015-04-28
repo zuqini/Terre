@@ -21,6 +21,7 @@ public:
 protected:
 	Star* addStar(Star* entity);
 	Planet* addPlanet(Planet* entity);
+	void nuke();
 private:
 	b2RayCastInput makeInput(Vec2 p1, Vec2 p2);
 	void cast360(Entity* source, std::vector<b2RayCastInput>& inputs);

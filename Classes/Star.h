@@ -12,6 +12,7 @@ class Star: public Entity
 {
 public:
 	Star(b2World* world, b2Body* body);
+	~Star();
 };
 
 #endif

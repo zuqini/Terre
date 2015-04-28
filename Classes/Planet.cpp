@@ -3,6 +3,9 @@
 Planet::Planet(b2World* world, b2Body* body): Entity(world, body)
 {
 }
+Planet::~Planet()
+{
+}
 
 float Planet::getRadius()
 {

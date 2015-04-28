@@ -8,8 +8,9 @@
 #define WORLD 0
 #define OVERLAY 1
 
-#define LIGHT 0
-#define HUD 1
+#define OBJECTS 0
+#define LIGHT 1
+#define HUD 2
 
 #define ZOOM_MULTIPLIER 0.0005f
 
@@ -62,17 +63,18 @@ bool MainScene::init()
 
     auto world = Node::create();
     world->setPosition(origin);
+    auto objects = Node::create();
     auto lightNode = DrawNode::create();
     auto HUDNode = DrawNode::create();
+    world->addChild(objects, 0, OBJECTS);
     world->addChild(lightNode, 10, LIGHT);
     world->addChild(HUDNode, 11, HUD);
     for (std::vector<Entity*>::const_iterator iterator = entities.begin(); iterator != entities.end(); ++iterator) {
-    	world->addChild((*iterator)->getSprite());
+    	objects->addChild((*iterator)->getSprite());
     	log("ADDED SPRITE");
     }
     scaleCenter(world, 0.3, origin);
 
-    // add a "close" icon to exit the progress. it's an autorelease object
 	_starUnselect = MenuItemImage::create(
 							   "starNormal.png",
 							   "starSelect.png",
@@ -100,10 +102,18 @@ bool MainScene::init()
 	_planetToggle->setPosition(Vec2(origin.x + visibleSize.width - _planetToggle->getContentSize().width,
 								origin.y + 150 + _planetToggle->getContentSize().height));
 
+    MenuItemImage* clearButton = MenuItemImage::create(
+    							   "clearNormal.png",
+    							   "clearSelect.png",
+    							   CC_CALLBACK_1(MainScene::clearCallBack, this));
+    clearButton->setPosition(Vec2(origin.x + visibleSize.width - clearButton->getContentSize().width,
+								origin.y + 300 + clearButton->getContentSize().height));
+
 	// create menu, it's an autorelease object
 	auto overLay = Menu::create();
 	overLay->addChild(_starToggle);
 	overLay->addChild(_planetToggle);
+	overLay->addChild(clearButton);
 	overLay->setPosition(Vec2::ZERO);
 	this->addChild(overLay, 1, OVERLAY);
 
@@ -168,19 +178,21 @@ void MainScene::onTouchEnded(Touch* touch, Event* event)
 	if(_selected == STAR || _selected == PLANET)
 	{
 		auto world = this->getChildByTag(WORLD);
-		DrawNode* drawNode = (DrawNode*)world->getChildByTag(HUD);
+		auto objects = world->getChildByTag(OBJECTS);
+		auto drawNode = (DrawNode*)world->getChildByTag(HUD);
 		drawNode->clear();
 
-		Vec2 start = touch->getStartLocation();
-		Vec2 end = touch->getLocation();
+		Vec2 start = world->convertToNodeSpace(touch->getStartLocation());
+		Vec2 end = world->convertToNodeSpace(touch->getLocation());
 		Vec2 diff = end - start;
 
-		Vec2 loc = world->convertToNodeSpace(start);
+		Vec2 loc = start;
 
 		Entity* entity = _selected == STAR ? (Entity*)universe.createStarAt(loc) : (Entity*)universe.createPlanetAt(loc);
-		diff.scale(entity->getMass());
+		diff = entity->getMass() * diff;
+		log("%f", diff.getLength());
 		entity->applyImpulse(diff);
-		world->addChild(entity->getSprite());
+		objects->addChild(entity->getSprite());
 
 		log("success");
 	}
@@ -202,7 +214,6 @@ void MainScene::onTouchMoved(Touch* touch, Event* event)
 		Vec2 start = world->convertToNodeSpace(touch->getStartLocation());
 		Vec2 end = world->convertToNodeSpace(touch->getLocation());
 		drawNode->drawLine(start, end, Color4F::GREEN);
-		log("%f, %f || %f, %f", start.x, start.y, end.x, end.y);
 	}
 }
 
@@ -246,4 +257,11 @@ void MainScene::planetCallBack(Ref* pSender)
 	{
 		_selected = NONE;
 	}
+}
+
+void MainScene::clearCallBack(Ref* pSender)
+{
+	MenuItemImage* clearButton = (MenuItemImage*)(pSender);
+	universe.nuke();
+	this->getChildByTag(WORLD)->getChildByTag(OBJECTS)->removeAllChildrenWithCleanup(true);
 }

@@ -152,3 +152,14 @@ std::vector<Entity*> Universe::getEntities()
 {
 	return entities;
 }
+
+void Universe::nuke()
+{
+	DynamicLightWorld::nuke();
+	//The universe entities vector should be a comprehensive list of all entities.
+	for(std::vector<Entity*>::iterator it = entities.begin(); it != entities.end(); ++it) {
+		delete *it;
+		*it = NULL;
+	}
+	entities.clear();
+}

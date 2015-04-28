@@ -9,6 +9,11 @@ USING_NS_CC;
 
 Entity::Entity(b2World* world, b2Body* body): world(world), body(body){};
 
+Entity::~Entity()
+{
+	body->GetWorld()->DestroyBody(body);
+}
+
 Entity* Entity::makePlanet(b2World* world, float density, Vec2 pos, Sprite* sprite)
 {
 	return new Planet(world, BodyUtil::createCircularBody(world, density, pos, sprite));

@@ -12,6 +12,7 @@ class Planet: public Entity
 {
 public:
 	Planet(b2World* world, b2Body* body);
+	~Planet();
 	float getRadius();
 };
 

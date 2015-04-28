@@ -17,6 +17,7 @@ public:
 	Star* createStarAt(Vec2 location);
 	Planet* createPlanetAt(Vec2 location);
 	std::vector<Entity*> getEntities();
+	void nuke();
 	void step(float delta);
 	void updatePos();
 private:
