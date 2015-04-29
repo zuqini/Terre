@@ -7,7 +7,7 @@ Create various star systems and observe their behaviours!
 
 ### Android
 
-Download and install the Android application package [here](https://github.com/zuqini/Terre/releases/download/v0.2.1/Terre.apk).
+Download and install the Android application package [here](https://github.com/zuqini/Terre/releases/download/v0.3-alpha/Terre.apk).
 
 * Drag to move the camera
 * Pinch to zoom in and zoom out
