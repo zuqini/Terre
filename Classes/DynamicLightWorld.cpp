@@ -13,6 +13,10 @@ DynamicLightWorld::DynamicLightWorld()
 {
 }
 
+DynamicLightWorld::~DynamicLightWorld()
+{
+}
+
 Star* DynamicLightWorld::addStar(Star* entity)
 {
 	stars.push_back(entity);
@@ -241,6 +245,10 @@ void DynamicLightWorld::updateLight(DrawNode* drawNode) {
 	}
 }
 
+/**
+ * DynamicLightWorld nuke does not deallocate planet and stars, and is therefore unsafe.
+ * Need to keep a comprehensive list of entities and delete elsewhere.
+ */
 void DynamicLightWorld::nuke()
 {
 	planets.clear();

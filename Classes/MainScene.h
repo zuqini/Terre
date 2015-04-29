@@ -12,6 +12,7 @@ public:
     virtual bool init();
     void starCallBack(cocos2d::Ref* pSender);
     void planetCallBack(cocos2d::Ref* pSender);
+    void systemCallBack(cocos2d::Ref* pSender);
     void clearCallBack(cocos2d::Ref* pSender);
     void addEntitySubs(Entity* entity);
     void update(float) override;
@@ -37,6 +38,10 @@ private:
     MenuItemToggle* _planetToggle;
     MenuItemImage* _planetUnselect;
     MenuItemImage* _planetSelect;
+
+	MenuItemToggle* _systemToggle;
+	MenuItemImage* _systemUnselect;
+	MenuItemImage* _systemSelect;
 
     void scaleCenter(cocos2d::Node*, float, cocos2d::Vec2);
 

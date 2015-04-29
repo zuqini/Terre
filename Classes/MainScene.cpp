@@ -102,17 +102,31 @@ bool MainScene::init()
 	_planetToggle->setPosition(Vec2(origin.x + visibleSize.width - _planetToggle->getContentSize().width,
 								origin.y + 150 + _planetToggle->getContentSize().height));
 
+	_systemUnselect = MenuItemImage::create(
+							   "systemNormal.png",
+							   "systemSelect.png",
+							   CC_CALLBACK_1(MainScene::systemCallBack, this));
+
+	_systemSelect = MenuItemImage::create(
+							   "systemFinal.png",
+							   "systemSelect.png",
+							   CC_CALLBACK_1(MainScene::systemCallBack, this));
+	_systemToggle = MenuItemToggle::createWithCallback(CC_CALLBACK_1(MainScene::systemCallBack, this), _systemUnselect, _systemSelect, NULL);
+	_systemToggle->setPosition(Vec2(origin.x + visibleSize.width - _systemToggle->getContentSize().width,
+								origin.y + 300 + _systemToggle->getContentSize().height));
+
     MenuItemImage* clearButton = MenuItemImage::create(
     							   "clearNormal.png",
     							   "clearSelect.png",
     							   CC_CALLBACK_1(MainScene::clearCallBack, this));
-    clearButton->setPosition(Vec2(origin.x + visibleSize.width - clearButton->getContentSize().width,
-								origin.y + 300 + clearButton->getContentSize().height));
+    clearButton->setPosition(Vec2(origin.x + clearButton->getContentSize().width,
+								origin.y + clearButton->getContentSize().height));
 
 	// create menu, it's an autorelease object
 	auto overLay = Menu::create();
 	overLay->addChild(_starToggle);
 	overLay->addChild(_planetToggle);
+	overLay->addChild(_systemToggle);
 	overLay->addChild(clearButton);
 	overLay->setPosition(Vec2::ZERO);
 	this->addChild(overLay, 1, OVERLAY);
@@ -196,6 +210,17 @@ void MainScene::onTouchEnded(Touch* touch, Event* event)
 
 		log("success");
 	}
+	else if(_selected == SYSTEM)
+	{
+		auto world = this->getChildByTag(WORLD);
+		auto objects = world->getChildByTag(OBJECTS);
+
+		std::vector<Entity*> newSystem = universe.generateSystem(world->convertToNodeSpace(touch->getLocation()));
+		for(std::vector<Entity*>::iterator it = newSystem.begin(); it != newSystem.end(); ++it)
+		{
+			objects->addChild((*it)->getSprite());
+		}
+	}
 }
 
 void MainScene::onTouchMoved(Touch* touch, Event* event)
@@ -208,7 +233,11 @@ void MainScene::onTouchMoved(Touch* touch, Event* event)
 		Vec2 currPos = world->getPosition();
 		currPos.add(diff);
 		world->setPosition(currPos);
-	} else {
+	} else if(_selected == SYSTEM)
+	{
+	}
+	else
+	{
 		auto drawNode = (DrawNode*)world->getChildByTag(HUD);
 		drawNode->clear();
 		Vec2 start = world->convertToNodeSpace(touch->getStartLocation());
@@ -240,6 +269,7 @@ void MainScene::starCallBack(Ref* pSender)
 	{
 		_selected = STAR;
 		_planetToggle->setSelectedIndex(UNSELECT);
+		_systemToggle->setSelectedIndex(UNSELECT);
 	} else if(starToggle->getSelectedItem() == _starUnselect)
 	{
 		_selected = NONE;
@@ -253,7 +283,22 @@ void MainScene::planetCallBack(Ref* pSender)
 	{
 		_selected = PLANET;
 		_starToggle->setSelectedIndex(UNSELECT);
+		_systemToggle->setSelectedIndex(UNSELECT);
 	} else if(planetToggle->getSelectedItem() == _planetUnselect)
+	{
+		_selected = NONE;
+	}
+}
+
+void MainScene::systemCallBack(Ref* pSender)
+{
+	MenuItemToggle* systemToggle = (MenuItemToggle *)(pSender);
+	if(systemToggle->getSelectedItem() == _systemSelect)
+	{
+		_selected = SYSTEM;
+		_starToggle->setSelectedIndex(UNSELECT);
+		_planetToggle->setSelectedIndex(UNSELECT);
+	} else if(systemToggle->getSelectedItem() == _systemUnselect)
 	{
 		_selected = NONE;
 	}

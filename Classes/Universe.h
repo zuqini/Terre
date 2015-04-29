@@ -13,7 +13,9 @@ class Universe : public DynamicLightWorld
 {
 public:
 	Universe();
+	~Universe();
 	void generateEntities(Vec2 origin, Size visibleSize);
+	std::vector<Entity*> generateSystem(Vec2 origin);
 	Star* createStarAt(Vec2 location);
 	Planet* createPlanetAt(Vec2 location);
 	std::vector<Entity*> getEntities();
@@ -22,7 +24,6 @@ public:
 	void updatePos();
 private:
 	Entity* addEntity(Entity* entity);
-	void generateSystem(Vec2 origin, Size visibleSize, int starOpt);
 	void applyGravity();
 
 	std::vector<Entity*> entities;

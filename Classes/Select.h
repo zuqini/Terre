@@ -5,7 +5,8 @@ enum Select
 {
 	NONE,
 	STAR,
-	PLANET
+	PLANET,
+	SYSTEM
 };
 
 #endif

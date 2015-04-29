@@ -10,13 +10,18 @@ USING_NS_CC;
 
 Universe::Universe() : DynamicLightWorld()
 {
+	srand (time(0));
 	b2Vec2 gravity = b2Vec2(0.0f, 0.0f);
 	world = new b2World(gravity);
 }
 
+Universe::~Universe()
+{
+
+}
+
 Star* Universe::createStarAt(Vec2 loc)
 {
-	srand (time(0));
 	Sprite* starSprite;
 	auto starOpt = rand() % 3 + 0;
 	switch(starOpt)
@@ -41,7 +46,6 @@ Star* Universe::createStarAt(Vec2 loc)
 
 Planet* Universe::createPlanetAt(Vec2 loc)
 {
-	srand (time(0));
 	Sprite* planetSprite;
 	switch(rand() % 4)
 	{
@@ -75,15 +79,12 @@ void Universe::step(float delta)
 	world->Step(delta, 8, 3);
 }
 
-void Universe::generateSystem(Vec2 origin, Size visibleSize, int starOpt)
+std::vector<Entity*> Universe::generateSystem(Vec2 origin)
 {
-	/*
-	 * TODO
-	 * need better way to generateSystems
-	 * need to update for new gravity constant
-	 */
+	std::vector<Entity*> newSystem;
 
-	Star* star = createStarAt(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+	Star* star = createStarAt(origin);
+	newSystem.push_back(star);
 	Vec2 currPos = star->getPos();
 	currPos.add(Vec2(800,0));
 	Sprite* planetSprite;
@@ -91,33 +92,16 @@ void Universe::generateSystem(Vec2 origin, Size visibleSize, int starOpt)
 	for(auto i = 0; i < planetCount; ++i)
 	{
 		currPos.add(Vec2((i+1)*500,0));
-		switch(rand() % 4)
-		{
-		case 0:
-			planetSprite = Sprite::create("Planet00.png");
-			break;
-		case 1:
-			planetSprite = Sprite::create("Planet01.png");
-			break;
-		case 2:
-			planetSprite = Sprite::create("Planet02.png");
-			break;
-		case 3:
-			planetSprite = Sprite::create("Planet03.png");
-			break;
-		}
-		Planet* currPlanet = (Planet*)addEntity(Entity::makePlanet(world, rand() % 1000 + 500, currPos, planetSprite));
-		addPlanet(currPlanet);
+		Planet* currPlanet = createPlanetAt(currPos);
+		newSystem.push_back(currPlanet);
 		currPlanet->applyImpulse(Vec2(0,currPlanet->getMass() * sqrt(G_CONSTANT * star->getMass() / star->getPos().getDistance(currPlanet->getPos()))));
 	}
+	return newSystem;
 }
 
 void Universe::generateEntities(Vec2 origin, Size visibleSize)
 {
-	//createStarAt(origin);
-	generateSystem(origin, visibleSize, 2);	//Apply more times at different locations to generate more systems
-	//generateSystem(origin + Vec2(10000,10000), visibleSize, 0);	//Apply more times at different locations to generate more systems
-	//generateSystem(origin + Vec2(20000,0), visibleSize, 1);	//Apply more times at different locations to generate more systems
+	generateSystem(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));	//Apply more times at different locations to generate more systems
 }
 
 void Universe::applyGravity()
