@@ -15,7 +15,7 @@ class DynamicLightWorld
 {
 public:
 	DynamicLightWorld();
-	~DynamicLightWorld();
+	virtual ~DynamicLightWorld();
 	std::vector<struct LightRay> getRaysforSource(Entity* Source);
 	std::vector<Star*> getStars();
 	void nuke();

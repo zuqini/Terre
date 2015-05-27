@@ -13,7 +13,7 @@ class Universe : public DynamicLightWorld
 {
 public:
 	Universe();
-	~Universe();
+	virtual ~Universe();
 	void generateEntities(Vec2 origin, Size visibleSize);
 	std::vector<Entity*> generateSystem(Vec2 origin);
 	Star* createStarAt(Vec2 location);
